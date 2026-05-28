@@ -39,18 +39,9 @@ export async function searchTracks(query) {
     id:       track.id,
     name:     track.name,
     artist:   track.artists.map(a => a.name).join(', '),
+    artistId: track.artists[0]?.id ?? null,
     album:    track.album.name,
     image:    track.album.images[1]?.url ?? track.album.images[0]?.url ?? null,
     duration: Math.round(track.duration_ms / 1000)
   }))
-}
-
-export async function getAudioFeatures(trackId) {
-  const token = await getToken()
-
-  const res = await fetch(`https://api.spotify.com/v1/audio-features/${trackId}`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  })
-
-  return await res.json()
 }
