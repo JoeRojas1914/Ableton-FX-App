@@ -1,0 +1,56 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #111111;
+  color: #ffffff;
+  font-family: 'Courier New', Courier, monospace;
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.header {
+  background: #1a1a1a;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #2d2d2d;
+}
+
+.dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+.dot.red    { background: #ff5f57; }
+.dot.yellow { background: #febc2e; }
+.dot.green  { background: #28c840; }
+
+.app-name {
+  color: #666666;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  margin: 0 auto;
+}
+
+.content {
+  padding: 2rem 1.5rem;
+}
+
+.status {
+  font-size: 13px;
+  color: #00c896;
+  background: #082b1e;
+  border: 1px solid #00c896;
+  border-radius: 6px;
+  padding: 10px 14px;
+  display: inline-block;
+}
