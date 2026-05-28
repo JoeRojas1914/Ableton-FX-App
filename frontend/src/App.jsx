@@ -14,6 +14,7 @@ const INITIAL = {
   song:        '',
   artist:      '',
   spotifyId:   '',
+  trackImage:  null,
   instrument:  '',
   audioFile:   null
 }

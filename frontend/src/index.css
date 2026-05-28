@@ -272,3 +272,15 @@ body {
   color: #444;
   margin-bottom: 12px;
 }
+
+.result-duration {
+  font-size: 11px;
+  color: #444;
+  flex-shrink: 0;
+  margin-left: auto;
+  padding-left: 8px;
+}
+
+.result-thumb, .track-thumb {
+  object-fit: cover;
+}
