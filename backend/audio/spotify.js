@@ -25,17 +25,25 @@ async function getToken() {
   return tokenCache
 }
 
-export async function searchTracks(query) {
-  const token = await getToken()
+export const PAGE_SIZE = 10
+const MAX_RESULTS     = 1000   // Spotify no deja pasar de offset + limit = 1000
 
-  const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=8&market=MX`
+export async function searchTracks(query, page = 0) {
+  const token  = await getToken()
+  const offset = page * PAGE_SIZE
+
+  const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}` +
+              `&type=track&limit=${PAGE_SIZE}&offset=${offset}&market=MX`
   const res  = await fetch(url, {
     headers: { 'Authorization': `Bearer ${token}` }
   })
 
   const data = await res.json()
+  if (!res.ok) throw new Error(data.error?.message ?? `Spotify respondió ${res.status}`)
 
-  return data.tracks.items.map(track => ({
+  const items = data.tracks?.items ?? []
+
+  const tracks = items.map(track => ({
     id:       track.id,
     name:     track.name,
     artist:   track.artists.map(a => a.name).join(', '),
@@ -44,4 +52,12 @@ export async function searchTracks(query) {
     image:    track.album.images[1]?.url ?? track.album.images[0]?.url ?? null,
     duration: Math.round(track.duration_ms / 1000)
   }))
+
+  return {
+    tracks,
+    page,
+    // "total" y "next" de Spotify no son fiables (subestiman y se corrigen al avanzar):
+    // si la página vino llena, asumimos que hay otra
+    hasNext: items.length === PAGE_SIZE && offset + PAGE_SIZE < MAX_RESULTS
+  }
 }

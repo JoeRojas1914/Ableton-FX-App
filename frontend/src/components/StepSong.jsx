@@ -6,27 +6,38 @@ function StepSong({ config, update, onNext, onBack }) {
   const [searching, setSearching] = useState(false)
   const [searched,  setSearched]  = useState(false)
   const [error,     setError]     = useState('')
+  const [page,      setPage]      = useState(0)
+  const [hasNext,   setHasNext]   = useState(false)
+  const [lastQuery, setLastQuery] = useState('')
 
   const canContinue = config.song.trim().length > 0
 
-  async function handleSearch() {
-    if (!query.trim()) return
+  async function search(q, p) {
+    if (!q.trim()) return
     setSearching(true)
     setSearched(true)
     setError('')
 
     try {
-      const res  = await fetch(`http://localhost:3001/api/spotify/search?q=${encodeURIComponent(query)}`)
+      const res  = await fetch(`http://localhost:3001/api/spotify/search?q=${encodeURIComponent(q)}&page=${p}`)
       const data = await res.json()
       if (data.error) throw new Error(data.error)
       setResults(data.tracks || [])
+      setHasNext(Boolean(data.hasNext))
+      setPage(p)
+      setLastQuery(q)
     } catch {
       setError('No se pudo buscar en Spotify. Revisa que el backend esté corriendo y que backend/.env tenga tus credenciales.')
       setResults([])
+      setHasNext(false)
     }
 
     setSearching(false)
   }
+
+  // Una búsqueda nueva siempre empieza en la primera página
+  const handleSearch = () => search(query, 0)
+  const goToPage     = p => search(lastQuery, p)
 
   function selectTrack(track) {
     update('song',       track.name)
@@ -36,6 +47,8 @@ function StepSong({ config, update, onNext, onBack }) {
     setResults([])
     setSearched(false)
     setQuery('')
+    setPage(0)
+    setHasNext(false)
   }
 
   function clearTrack() {
@@ -70,6 +83,8 @@ function StepSong({ config, update, onNext, onBack }) {
               setResults([])
               setSearched(false)
               setQuery('')
+              setPage(0)
+              setHasNext(false)
             }}
           >
             {m.label}
@@ -136,8 +151,32 @@ function StepSong({ config, update, onNext, onBack }) {
                 </div>
               )}
 
+              {(page > 0 || hasNext) && (
+                <div className="pager">
+                  <button
+                    className="btn-ghost"
+                    onClick={() => goToPage(page - 1)}
+                    disabled={searching || page === 0}
+                  >
+                    Anteriores
+                  </button>
+                  <span className="pager-page">Página {page + 1}</span>
+                  <button
+                    className="btn-ghost"
+                    onClick={() => goToPage(page + 1)}
+                    disabled={searching || !hasNext}
+                  >
+                    Más resultados
+                  </button>
+                </div>
+              )}
+
               {searched && results.length === 0 && !searching && !error && (
-                <div className="search-empty">Sin resultados para "{query}"</div>
+                <div className="search-empty">
+                  {page > 0
+                    ? 'No hay más resultados. Vuelve a la página anterior o prueba otra búsqueda.'
+                    : `Sin resultados para "${lastQuery || query}"`}
+                </div>
               )}
             </>
           )}

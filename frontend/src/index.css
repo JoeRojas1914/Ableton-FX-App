@@ -169,6 +169,12 @@ button, input { font: inherit; color: inherit; }
 .result-meta { font-size: 14px; color: var(--muted); }
 .result-duration { margin-left: auto; padding-left: 8px; font-size: 14px; color: var(--faint); font-variant-numeric: tabular-nums; }
 
+.pager { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.pager .btn-ghost { padding: 7px 14px; font-size: 15px; }
+.pager .btn-ghost:disabled { color: var(--faint); border-color: var(--panel); cursor: not-allowed; background: none; }
+.pager-page { font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pager .btn-ghost:last-child { margin-left: auto; }
+
 .search-empty { padding: 12px 0; font-size: 15px; color: var(--muted); }
 .search-empty.error { color: var(--red); }
 

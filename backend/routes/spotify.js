@@ -5,14 +5,14 @@ const router = Router()
 
 router.get('/search', async (req, res) => {
   const { q } = req.query
+  const page  = Math.max(0, parseInt(req.query.page, 10) || 0)
 
   if (!q || q.trim().length < 2) {
     return res.status(400).json({ error: 'Escribe al menos 2 caracteres' })
   }
 
   try {
-    const tracks = await searchTracks(q)
-    res.json({ tracks })
+    res.json(await searchTracks(q, page))
   } catch (err) {
     console.error('Error Spotify:', err.message)
     res.status(500).json({ error: 'Error al buscar en Spotify' })
