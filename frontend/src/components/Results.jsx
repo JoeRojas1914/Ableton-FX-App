@@ -47,29 +47,25 @@ function Results({ config, onRestart }) {
 },  [config.inputMethod, config.song, config.artist, config.instrument, config.license, config.version, config.audioFile])
 
   if (loading) return (
-    <div className="step">
-      <div className="step-eyebrow">Paso 4</div>
-      <h2 className="step-title">Analizando...</h2>
-      <div className="loading-bar">
-        <div className="loading-track" />
+    <div className="step" aria-busy="true">
+      <h2 className="step-title">Analizando {config.song}</h2>
+      <div className="loading-meter" aria-hidden="true">
+        {Array.from({ length: 12 }, (_, i) => (
+          <span key={i} style={{ animationDelay: `${i * 0.08}s` }} />
+        ))}
       </div>
-      <p className="step-desc" style={{ marginTop: '12px' }}>
-        Calculando parámetros para {config.instrument} · {config.song}
-      </p>
       <p className="step-desc">
-        Descargando audio, aislando el instrumento y midiéndolo. Puede tardar 30–90 segundos.
+        Descargamos el audio, aislamos el instrumento y lo medimos. La primera vez tarda entre 30 y 90 segundos.
       </p>
     </div>
   )
 
-
   if (error) return (
     <div className="step">
-      <div className="step-eyebrow">Paso 4</div>
-      <h2 className="step-title">Error</h2>
-      <div className="error-box">{error}</div>
+      <h2 className="step-title">No se pudo analizar la canción</h2>
+      <div className="error-box" role="alert">{error}</div>
       <div className="nav-row">
-        <button className="btn-ghost" onClick={onRestart}>← Volver al inicio</button>
+        <button className="btn-ghost" onClick={onRestart}>Volver al inicio</button>
       </div>
     </div>
   )
@@ -85,70 +81,67 @@ function Results({ config, onRestart }) {
   ]
 
   return (
-    <div className="step">
-      <div className="step-eyebrow">Paso 4</div>
-      <h2 className="step-title">Cadena de efectos</h2>
-
+    <div className="step wide">
       <div className="song-summary">
         {config.trackImage && (
-          <img className="song-cover" src={config.trackImage} alt={config.song} />
+          <img className="song-cover" src={config.trackImage} alt="" />
         )}
         <div>
-          <div className="song-title">{config.song}</div>
-          <div className="song-artist">{config.artist}</div>
-          {meta.title && meta.title !== config.song && (
-            <div className="song-source">Audio analizado: {meta.title}</div>
-          )}
+          <h2 className="song-title">{config.song}</h2>
+          {config.artist && <div className="song-artist">{config.artist}</div>}
         </div>
       </div>
 
-      <div className="analyzed-badge">{meta.analyzed}</div>
-
-      <div className="analysis-bar">
+      <div className="readout">
         {metrics.map(m => (
-          <div key={m.label} className="analysis-item">
-            <div className="analysis-val">{m.val}</div>
-            <div className="analysis-key">{m.label}</div>
+          <div key={m.label} className="readout-item">
+            <div className="readout-val">{m.val}</div>
+            <div className="readout-key">{m.label}</div>
           </div>
         ))}
       </div>
 
+      <p className="analyzed-line">
+        Medido sobre: {meta.analyzed.toLowerCase()}
+        {meta.title && meta.title !== config.song && <> de “{meta.title}”</>}
+      </p>
+
       {notes.length > 0 && (
-        <ul className="notes-box">
+        <ul className="notes">
           {notes.map((n, i) => <li key={i}>{n}</li>)}
         </ul>
       )}
 
-      <div className="fx-chain">
-        {chain.map((fx, i) => (
-          <div key={i} className="fx-card">
-            <div className="fx-header">
-              <span className="fx-order">{fx.order}</span>
-              <span className="fx-name">{fx.name}</span>
-            </div>
-            <div className="fx-purpose">{fx.purpose}</div>
-            <div className="params-grid">
-              {fx.params.map((p, j) => (
-                <div key={j} className="param">
+      <section className="rack" aria-label="Cadena de efectos, en orden de señal">
+        {chain.map(fx => (
+          <article key={fx.name} className="device">
+            <header className="device-head">
+              <span className="device-led" aria-hidden="true" />
+              <h3 className="device-name">{fx.name}</h3>
+            </header>
+            <p className="device-purpose">{fx.purpose}</p>
+            <ul className="params">
+              {fx.params.map(p => (
+                <li key={p.key} className="param">
                   <div className="param-key">{p.key}</div>
                   <div className="param-val">{p.val}</div>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
             {fx.why?.length > 0 && (
-              <details className="fx-why">
-                <summary>¿Por qué estos valores?</summary>
+              <details className="device-why">
+                <summary>Por qué estos valores</summary>
                 <ul>
                   {fx.why.map((w, j) => <li key={j}>{w}</li>)}
                 </ul>
               </details>
             )}
-          </div>
+          </article>
         ))}
-      </div>
+      </section>
 
       <div className="nav-row">
-        <button className="btn-ghost" onClick={onRestart}>← Nueva búsqueda</button>
+        <button className="btn-ghost" onClick={onRestart}>Analizar otra canción</button>
       </div>
     </div>
   )

@@ -112,7 +112,7 @@ function eqDevice(eq) {
     purpose: 'imitar el balance tonal del instrumento en la canción',
     params:  sorted.length
       ? sorted.map((b, i) => ({
-          key: `Banda ${i + 1} · ${b.type}`,
+          key: `${b.type} (banda ${i + 1})`,
           val: b.type === 'Bell'
             ? `${hz(b.freq)}  ${sign(b.gain)} dB  Q ${r1(b.q)}`
             : b.gain !== undefined ? `${hz(b.freq)}  ${sign(b.gain)} dB` : hz(b.freq)
@@ -252,8 +252,8 @@ function buildDelay(features, inst, bpm) {
     purpose: 'repeticiones sincronizadas al tempo (opcional)',
     params: [
       { key: 'Modo',     val: 'Sync' },
-      { key: 'Time L',   val: `1/8 · ${r(60000 / bpm / 2)} ms` },
-      { key: 'Time R',   val: `1/4 · ${r(60000 / bpm)} ms` },
+      { key: 'Time L',   val: `1/8 (${r(60000 / bpm / 2)} ms)` },
+      { key: 'Time R',   val: `1/4 (${r(60000 / bpm)} ms)` },
       { key: 'Feedback', val: `${clamp(r(15 + wetness * 30), 15, 45)}%` },
       { key: 'Dry/Wet',  val: `${clamp(r(5 + wetness * 15), 5, 20)}%` }
     ],

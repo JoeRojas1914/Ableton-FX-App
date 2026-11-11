@@ -20,8 +20,8 @@ function StepSong({ config, update, onNext, onBack }) {
       const data = await res.json()
       if (data.error) throw new Error(data.error)
       setResults(data.tracks || [])
-    } catch (err) {
-      setError('No se pudo conectar con Spotify. Verifica el backend.')
+    } catch {
+      setError('No se pudo buscar en Spotify. Revisa que el backend esté corriendo y que backend/.env tenga tus credenciales.')
       setResults([])
     }
 
@@ -47,10 +47,10 @@ function StepSong({ config, update, onNext, onBack }) {
 
   return (
     <div className="step">
-      <div className="step-eyebrow">Paso 2</div>
-      <h2 className="step-title">Selecciona la canción</h2>
+      <h2 className="step-title">¿Qué canción quieres imitar?</h2>
+      <p className="step-desc">Búscala en Spotify, pega un link de YouTube o sube el audio.</p>
 
-      <div className="method-tabs">
+      <div className="method-tabs" role="tablist">
         {[
           { id: 'spotify', label: 'Spotify' },
           { id: 'youtube', label: 'YouTube' },
@@ -58,6 +58,8 @@ function StepSong({ config, update, onNext, onBack }) {
         ].map(m => (
           <button
             key={m.id}
+            role="tab"
+            aria-selected={config.inputMethod === m.id}
             className={`method-tab ${config.inputMethod === m.id ? 'active' : ''}`}
             onClick={() => {
               update('inputMethod', m.id)
@@ -87,17 +89,17 @@ function StepSong({ config, update, onNext, onBack }) {
                 <div className="track-name">{config.song}</div>
                 <div className="track-artist">{config.artist}</div>
               </div>
-              <button className="track-clear" onClick={clearTrack}>✕</button>
+              <button className="track-clear" onClick={clearTrack}>Cambiar</button>
             </div>
           ) : (
             <>
               <div className="search-row">
                 <div className="search-wrap">
-                  <span className="search-icon">⌕</span>
                   <input
                     className="search-input"
-                    type="text"
-                    placeholder="Artista o nombre de canción..."
+                    type="search"
+                    aria-label="Buscar en Spotify"
+                    placeholder="Artista o canción"
                     value={query}
                     onChange={e => setQuery(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleSearch()}
@@ -108,11 +110,11 @@ function StepSong({ config, update, onNext, onBack }) {
                   onClick={handleSearch}
                   disabled={searching || !query.trim()}
                 >
-                  {searching ? '...' : 'Buscar'}
+                  {searching ? 'Buscando' : 'Buscar'}
                 </button>
               </div>
 
-              {error && <div className="search-empty" style={{ color: '#c0392b' }}>{error}</div>}
+              {error && <div className="search-empty error">{error}</div>}
 
               {results.length > 0 && (
                 <div className="results-list">
@@ -144,11 +146,11 @@ function StepSong({ config, update, onNext, onBack }) {
 
       {config.inputMethod === 'youtube' && (
         <div className="search-wrap">
-          <span className="search-icon">⌕</span>
           <input
             className="search-input"
-            type="text"
-            placeholder="Pega el link de YouTube aquí..."
+            type="url"
+            aria-label="Link de YouTube"
+            placeholder="https://www.youtube.com/watch?v=…"
             value={config.song}
             onChange={e => update('song', e.target.value)}
           />
@@ -166,15 +168,15 @@ function StepSong({ config, update, onNext, onBack }) {
             }}
           />
           <label htmlFor="audio-file" className="file-drop-label">
-            {config.audioFile ? `✓  ${config.audioFile.name}` : 'Haz clic para seleccionar MP3, WAV o FLAC'}
+            {config.audioFile ? config.audioFile.name : 'Elige un MP3, WAV o FLAC'}
           </label>
         </div>
       )}
 
       <div className="nav-row">
-        <button className="btn-ghost" onClick={onBack}>← Atrás</button>
+        <button className="btn-ghost" onClick={onBack}>Atrás</button>
         <button className="btn-primary" onClick={onNext} disabled={!canContinue}>
-          Siguiente →
+          Continuar
         </button>
       </div>
     </div>

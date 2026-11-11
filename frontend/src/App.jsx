@@ -5,7 +5,9 @@ import StepInstrument from './components/StepInstrument'
 import Results        from './components/Results'
 import './index.css'
 
-const STEPS = ['Setup', 'Canción', 'Instrumento', 'Efectos']
+const STEPS = ['Tu Ableton', 'Canción', 'Instrumento', 'Efectos']
+
+const LICENSE_NAMES = { intro: 'Intro', standard: 'Standard', suite: 'Suite' }
 
 const INITIAL = {
   version:     '12',
@@ -34,32 +36,24 @@ function App() {
   return (
     <div className="app">
 
-      <div className="window-bar">
-        <span className="dot red"    />
-        <span className="dot yellow" />
-        <span className="dot green"  />
+      <header className="topbar">
         <span className="app-title">Ableton FX</span>
-        <span className="app-badge">Live {config.version} · {config.license}</span>
-      </div>
+        <span className="app-setup">Live {config.version} {LICENSE_NAMES[config.license]}</span>
+      </header>
 
-      <div className="step-bar">
+      <nav className="step-bar" aria-label="Pasos">
         {STEPS.map((label, i) => {
-          const n      = i + 1
-          const done   = n < step
-          const active = n === step
+          const n     = i + 1
+          const state = n < step ? 'done' : n === step ? 'active' : ''
           return (
-            <div key={n} className="step-item">
-              {n > 1 && <div className={`step-line ${done ? 'done' : ''}`} />}
-              <div className={`step-dot ${done ? 'done' : active ? 'active' : ''}`}>
-                {done ? '✓' : n}
-              </div>
-              <span className={`step-label ${active ? 'active' : done ? 'done' : ''}`}>
-                {label}
-              </span>
+            <div key={n} className={`step-item ${state}`} aria-current={n === step ? 'step' : undefined}>
+              <span className="step-num">{n}</span>
+              <span className="step-label">{label}</span>
+              <span className="step-led" />
             </div>
           )
         })}
-      </div>
+      </nav>
 
       <div className="step-content">
         {step === 1 && <StepSetup      config={config} update={update} onNext={goNext} />}
