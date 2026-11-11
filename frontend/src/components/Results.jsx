@@ -10,18 +10,30 @@ function Results({ config, onRestart }) {
     setLoading(true)
     setError('')
     try {
-      const res  = await fetch('http://localhost:3001/api/analyze', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          inputMethod: config.inputMethod,
-          song:        config.song,
-          artist:      config.artist,
-          instrument:  config.instrument,
-          license:     config.license,
-          version:     config.version
-        })
-      })
+      const fields = {
+        inputMethod: config.inputMethod,
+        song:        config.song,
+        artist:      config.artist,
+        instrument:  config.instrument,
+        license:     config.license,
+        version:     config.version
+      }
+
+      let options
+      if (config.inputMethod === 'file' && config.audioFile) {
+        const form = new FormData()
+        Object.entries(fields).forEach(([k, v]) => form.append(k, v ?? ''))
+        form.append('audio', config.audioFile)
+        options = { method: 'POST', body: form }
+      } else {
+        options = {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(fields)
+        }
+      }
+
+      const res  = await fetch('http://localhost:3001/api/analyze', options)
       const data = await res.json()
       if (data.error) throw new Error(data.error)
       setResult(data)
@@ -32,7 +44,7 @@ function Results({ config, onRestart }) {
   }
 
   analyze()
-},  [config.inputMethod, config.song, config.artist, config.instrument, config.license, config.version])
+},  [config.inputMethod, config.song, config.artist, config.instrument, config.license, config.version, config.audioFile])
 
   if (loading) return (
     <div className="step">
@@ -43,6 +55,9 @@ function Results({ config, onRestart }) {
       </div>
       <p className="step-desc" style={{ marginTop: '12px' }}>
         Calculando parámetros para {config.instrument} · {config.song}
+      </p>
+      <p className="step-desc">
+        Descargando audio, aislando el instrumento y midiéndolo. Puede tardar 30–90 segundos.
       </p>
     </div>
   )
@@ -59,7 +74,15 @@ function Results({ config, onRestart }) {
     </div>
   )
 
-  const { chain, meta } = result
+  const { chain, meta, notes = [] } = result
+
+  const metrics = [
+    { label: 'BPM',       val: meta.bpm },
+    { label: 'Tonalidad', val: meta.key },
+    { label: 'Loudness',  val: meta.loudness },
+    { label: 'Crest',     val: meta.crest },
+    { label: 'Estéreo',   val: meta.width }
+  ]
 
   return (
     <div className="step">
@@ -73,27 +96,28 @@ function Results({ config, onRestart }) {
         <div>
           <div className="song-title">{config.song}</div>
           <div className="song-artist">{config.artist}</div>
+          {meta.title && meta.title !== config.song && (
+            <div className="song-source">Audio analizado: {meta.title}</div>
+          )}
         </div>
       </div>
 
+      <div className="analyzed-badge">{meta.analyzed}</div>
+
       <div className="analysis-bar">
-        <div className="analysis-item">
-          <div className="analysis-val">{meta.bpm}</div>
-          <div className="analysis-key">BPM</div>
-        </div>
-        <div className="analysis-item">
-          <div className="analysis-val">{meta.key}</div>
-          <div className="analysis-key">Tonalidad</div>
-        </div>
-        <div className="analysis-item">
-          <div className="analysis-val">{meta.energy}%</div>
-          <div className="analysis-key">Energía</div>
-        </div>
-        <div className="analysis-item">
-          <div className="analysis-val">{meta.loudness}</div>
-          <div className="analysis-key">Loudness</div>
-        </div>
+        {metrics.map(m => (
+          <div key={m.label} className="analysis-item">
+            <div className="analysis-val">{m.val}</div>
+            <div className="analysis-key">{m.label}</div>
+          </div>
+        ))}
       </div>
+
+      {notes.length > 0 && (
+        <ul className="notes-box">
+          {notes.map((n, i) => <li key={i}>{n}</li>)}
+        </ul>
+      )}
 
       <div className="fx-chain">
         {chain.map((fx, i) => (
@@ -111,6 +135,14 @@ function Results({ config, onRestart }) {
                 </div>
               ))}
             </div>
+            {fx.why?.length > 0 && (
+              <details className="fx-why">
+                <summary>¿Por qué estos valores?</summary>
+                <ul>
+                  {fx.why.map((w, j) => <li key={j}>{w}</li>)}
+                </ul>
+              </details>
+            )}
           </div>
         ))}
       </div>

@@ -1,41 +1,44 @@
-import { Router }            from 'express'
-import { mapToAbleton }      from '../audio/mapper.js'
-import { analyzeFromSearch, analyzeFromURL } from '../audio/analyzer.js'
+import { Router }  from 'express'
+import multer      from 'multer'
+import { tmpdir }  from 'os'
+import { rm }      from 'fs/promises'
+import { mapToAbleton } from '../audio/mapper.js'
+import { analyze }      from '../audio/analyzer.js'
 
 const router = Router()
-const cache  = new Map()
+const upload = multer({
+  dest:   tmpdir(),
+  limits: { fileSize: 100 * 1024 * 1024 }
+})
 
-router.post('/', async (req, res) => {
-  const { inputMethod, song, artist, instrument } = req.body
+// Acepta JSON (Spotify / YouTube) o multipart/form-data con el campo "audio" (archivo)
+router.post('/', upload.single('audio'), async (req, res) => {
+  const { inputMethod, song, artist, instrument, license, version } = req.body
 
-  if (!song) {
+  let source, songKey
+  if (inputMethod === 'file') {
+    if (!req.file) return res.status(400).json({ error: 'No llegó el archivo de audio' })
+    source  = { type: 'file', path: req.file.path, name: req.file.originalname }
+    songKey = null
+  } else if (!song) {
     return res.status(400).json({ error: 'Falta el nombre de la canción o el link' })
+  } else if (inputMethod === 'youtube') {
+    source  = { type: 'url', url: song }
+    songKey = `url|${song}`
+  } else {
+    source  = { type: 'search', song, artist }
+    songKey = `search|${artist ?? ''}|${song}`.toLowerCase()
   }
 
-  const cacheKey = `${inputMethod}-${song}-${instrument}`
-
   try {
-    let features = null
-
-    if (cache.has(cacheKey)) {
-      console.log('Caché hit:', song)
-      features = cache.get(cacheKey)
-    } else if (inputMethod === 'youtube') {
-      features = await analyzeFromURL(song)
-    } else {
-      features = await analyzeFromSearch(song, artist)
-    }
-
-    cache.set(cacheKey, features)
-    setTimeout(() => cache.delete(cacheKey), 60 * 60 * 1000)
-
-    const result  = mapToAbleton(features, instrument)
-    result.source = features.source
+    const features = await analyze(source, instrument, songKey)
+    const result   = mapToAbleton(features, instrument, { license, version })
     res.json(result)
-
   } catch (err) {
-    console.error('Error en analyze:', err.message)
+    console.error('Error en analyze:', err)
     res.status(500).json({ error: `No se pudo analizar: ${err.message}` })
+  } finally {
+    if (req.file) rm(req.file.path, { force: true }).catch(() => {})
   }
 })
 

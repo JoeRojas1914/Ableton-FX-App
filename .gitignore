@@ -8,6 +8,8 @@ backend/.env
 frontend/dist/
 
 backend/uploads/
+backend/separation/.venv/
+__pycache__/
 
 .DS_Store
 Thumbs.db

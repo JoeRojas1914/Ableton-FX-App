@@ -332,11 +332,34 @@ body {
 }
 .song-title  { font-size: 14px; font-weight: 500; color: #fff; }
 .song-artist { font-size: 11px; color: #555; margin-top: 2px; }
+.song-source { font-size: 10px; color: #444; margin-top: 3px; }
+
+.analyzed-badge {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: .5px;
+  color: #00c896;
+  border: .5px solid #00c896;
+  border-radius: 3px;
+  padding: 2px 8px;
+  margin-bottom: 12px;
+}
+
+.notes-box {
+  background: #1d1a10;
+  border: 1px solid #4a3f1a;
+  border-radius: 6px;
+  padding: 10px 14px 10px 28px;
+  color: #c9a945;
+  font-size: 11px;
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
 
 /* --- barra de métricas --- */
 .analysis-bar {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
   gap: 8px;
   margin-bottom: 20px;
 }
@@ -385,3 +408,8 @@ body {
 }
 .param-key { font-size: 9px;  letter-spacing: .5px; color: #444; margin-bottom: 2px; }
 .param-val { font-size: 12px; font-weight: 500; color: #ccc; }
+
+.fx-why { margin-top: 10px; font-size: 11px; color: #777; }
+.fx-why summary { cursor: pointer; color: #555; }
+.fx-why summary:hover { color: #00c896; }
+.fx-why ul { margin: 6px 0 0; padding-left: 18px; line-height: 1.5; }
