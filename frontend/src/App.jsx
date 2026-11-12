@@ -7,7 +7,7 @@ import './index.css'
 
 const STEPS = ['Tu Ableton', 'Canción', 'Instrumento', 'Efectos']
 
-const LICENSE_NAMES = { intro: 'Intro', standard: 'Standard', suite: 'Suite' }
+const LICENSE_NAMES = { lite: 'Lite', intro: 'Intro', standard: 'Standard', suite: 'Suite' }
 
 const INITIAL = {
   version:     '12',

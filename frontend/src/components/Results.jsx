@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
+import ExportPanel from './ExportPanel'
 
 function Results({ config, onRestart }) {
   const [loading, setLoading] = useState(true)
   const [result,  setResult]  = useState(null)
   const [error,   setError]   = useState('')
+  const [attempt, setAttempt] = useState(0)
 
   useEffect(() => {
   async function analyze() {
@@ -38,13 +40,16 @@ function Results({ config, onRestart }) {
       if (data.error) throw new Error(data.error)
       setResult(data)
     } catch (err) {
-      setError(err.message || 'No se pudo analizar la canción')
+      const lostConnection = err instanceof TypeError
+      setError(lostConnection
+        ? 'Se perdió la conexión con el backend. Pasa si el servidor se reinició (por ejemplo, al guardar un archivo del backend) o si no está corriendo. Revisa la terminal del backend y vuelve a intentarlo.'
+        : err.message || 'No se pudo analizar la canción')
     }
     setLoading(false)
   }
 
   analyze()
-},  [config.inputMethod, config.song, config.artist, config.instrument, config.license, config.version, config.audioFile])
+},  [config.inputMethod, config.song, config.artist, config.instrument, config.license, config.version, config.audioFile, attempt])
 
   if (loading) return (
     <div className="step" aria-busy="true">
@@ -66,6 +71,7 @@ function Results({ config, onRestart }) {
       <div className="error-box" role="alert">{error}</div>
       <div className="nav-row">
         <button className="btn-ghost" onClick={onRestart}>Volver al inicio</button>
+        <button className="btn-primary" onClick={() => setAttempt(a => a + 1)}>Reintentar</button>
       </div>
     </div>
   )
@@ -139,6 +145,8 @@ function Results({ config, onRestart }) {
           </article>
         ))}
       </section>
+
+      <ExportPanel chain={chain} config={config} />
 
       <div className="nav-row">
         <button className="btn-ghost" onClick={onRestart}>Analizar otra canción</button>

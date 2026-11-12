@@ -3,6 +3,7 @@ import cors           from 'cors'
 import dotenv         from 'dotenv'
 import spotifyRouter  from './routes/spotify.js'
 import analyzeRouter  from './routes/analyze.js'
+import exportRouter   from './routes/export.js'
 
 dotenv.config()
 
@@ -14,6 +15,7 @@ app.use(express.json())
 
 app.use('/api/spotify',  spotifyRouter)
 app.use('/api/analyze',  analyzeRouter)
+app.use('/api/export',   exportRouter)
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', mensaje: 'Servidor de Ableton FX corriendo' })

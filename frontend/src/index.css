@@ -321,6 +321,21 @@ button, input { font: inherit; color: inherit; }
 .device-why ul { margin-top: 6px; padding-left: 16px; line-height: 1.4; }
 .device-why li + li { margin-top: 4px; }
 
+/* exportar */
+.export {
+  margin-top: 24px;
+  padding: 16px 18px;
+  background: var(--panel);
+  border-top: 1px solid var(--panel-hi);
+  border-radius: var(--radius);
+}
+.export-title { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+.export-text  { font-size: 15px; color: var(--muted); line-height: 1.45; max-width: 70ch; }
+.export-text.warn { color: #f3c48a; margin-top: 8px; }
+.export-text.ok   { color: var(--text); margin-top: 10px; }
+.export-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.export .btn-ghost:disabled, .export .btn-primary:disabled { opacity: .6; cursor: progress; }
+
 @media (max-width: 640px) {
   .topbar, .step-bar, .step-content { padding-left: 16px; padding-right: 16px; }
   .step-label { display: none; }

@@ -1,8 +1,9 @@
 const VERSIONS = ['10', '11', '12']
 
 const LICENSES = [
-  { id: 'intro',    label: 'Intro',    desc: 'Efectos básicos' },
-  { id: 'standard', label: 'Standard', desc: 'Suma Glue, Chorus, Saturator y más' },
+  { id: 'lite',     label: 'Lite',     desc: 'La que viene con controladores e interfaces' },
+  { id: 'intro',    label: 'Intro',    desc: 'Efectos básicos, con EQ Three' },
+  { id: 'standard', label: 'Standard', desc: 'Suma EQ Eight y Glue Compressor' },
   { id: 'suite',    label: 'Suite',    desc: 'Todos los efectos y Max for Live' }
 ]
 

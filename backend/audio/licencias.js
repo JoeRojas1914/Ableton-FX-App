@@ -1,15 +1,18 @@
+const BASIC = [
+  'EQ Three', 'Compressor', 'Reverb', 'Delay', 'Auto Filter',
+  'Limiter', 'Utility', 'Saturator', 'Chorus'
+]
+
 export const FX = {
-  intro: [
-    'EQ Eight', 'Compressor', 'Reverb', 'Delay',
-    'Auto Filter', 'Gate', 'Limiter', 'Utility', 'Saturator'
-  ],
+  lite:  BASIC,
+  intro: [...BASIC, 'Gate'],
   standard: [
-    'EQ Eight', 'Compressor', 'Glue Compressor', 'Multiband Dynamics',
+    'EQ Eight', 'EQ Three', 'Compressor', 'Glue Compressor', 'Multiband Dynamics',
     'Reverb', 'Delay', 'Auto Filter', 'Gate', 'Limiter',
     'Utility', 'Saturator', 'Chorus', 'Flanger', 'Phaser', 'Overdrive'
   ],
   suite: [
-    'EQ Eight', 'Compressor', 'Glue Compressor', 'Multiband Dynamics',
+    'EQ Eight', 'EQ Three', 'Compressor', 'Glue Compressor', 'Multiband Dynamics',
     'Reverb', 'Delay', 'Auto Filter', 'Gate', 'Limiter',
     'Utility', 'Saturator', 'Chorus', 'Flanger', 'Phaser', 'Overdrive',
     'Spectral Blur', 'Spectral Time', 'Convolution Reverb',
@@ -18,5 +21,5 @@ export const FX = {
 }
 
 export function tieneEfecto(nombre, license) {
-  return FX[license]?.includes(nombre) ?? false
+  return FX[license?.toLowerCase()]?.includes(nombre) ?? false
 }

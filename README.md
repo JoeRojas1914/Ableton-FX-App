@@ -6,7 +6,7 @@ Aplicación web que analiza canciones y genera configuraciones de efectos optimi
 
 El usuario sigue un flujo de 4 pasos:
 
-1. **Configuración** — Selecciona la versión de Ableton Live (10/11/12) y el tipo de licencia (Intro/Standard/Suite)
+1. **Configuración** — Selecciona la versión de Ableton Live (10/11/12) y el tipo de licencia (Lite/Intro/Standard/Suite). Lite e Intro no traen EQ Eight ni Glue Compressor, así que su cadena usa EQ Three
 2. **Canción** — Busca una canción por Spotify, ingresa una URL de YouTube, o sube un archivo de audio
 3. **Instrumento** — Elige el instrumento al que aplicar los efectos (kick, bajo, voces, master, etc.)
 4. **Resultados** — La app descarga el audio, lo analiza y genera una cadena de efectos con parámetros personalizados
@@ -138,6 +138,19 @@ npm run dev
 # → http://localhost:5173
 ```
 
+## Exportar a Ableton
+
+Desde la pantalla de resultados se genera un **Audio Effect Rack (`.adg`)** con toda la cadena configurada:
+
+- **Guardar en Ableton** lo escribe en `User Library/Presets/Audio Effects/Audio Effect Rack/Ableton FX/`, así aparece en el navegador de Live.
+- **Descargar .adg** baja el archivo para arrastrarlo a una pista.
+
+Cada dispositivo lleva su explicación en el campo de Info de Live. El rack se arma con los presets de tu instalación de Live como plantilla (se buscan en `C:\ProgramData\Ableton\Live */Resources/Core Library` o `/Applications/Ableton Live *.app`), así que solo abre en la misma versión mayor de Live que tienes instalada.
+
+Variables opcionales en `backend/.env`:
+- `ABLETON_CORE_LIBRARY` — ruta a la Core Library si Live está en otro lugar
+- `ABLETON_USER_LIBRARY` — ruta a tu User Library si la moviste
+
 ## API
 
 | Método | Endpoint | Descripción |
@@ -145,6 +158,8 @@ npm run dev
 | `GET` | `/api/health` | Estado del servidor |
 | `GET` | `/api/spotify/search?q=<query>` | Búsqueda de canciones en Spotify |
 | `POST` | `/api/analyze` | Analiza audio y genera la cadena de efectos |
+| `GET` | `/api/export/status` | Si se encontró Live y qué dispositivos se pueden exportar |
+| `POST` | `/api/export` | Genera el rack `.adg` (`save: true` lo guarda en la User Library) |
 
 ### Body de `/api/analyze`
 
